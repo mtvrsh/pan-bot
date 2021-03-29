@@ -106,8 +106,6 @@ func messageReactionAdd(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	switch {
 	case m.Emoji.Name == "KEKW":
 		s.MessageReactionAdd(m.ChannelID, m.MessageID, m.Emoji.APIName())
-	default:
-		s.MessageReactionAdd(m.ChannelID, m.MessageID, m.Emoji.APIName())
 	}
 }
 
