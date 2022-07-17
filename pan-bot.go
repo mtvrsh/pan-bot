@@ -27,7 +27,6 @@ func init() {
 }
 
 var token string
-var buffer = make([][]byte, 0)
 
 func main() {
 
@@ -36,44 +35,33 @@ func main() {
 		return
 	}
 
-	// Create a new Discord session using the provided bot token.
 	dg, err := discordgo.New("Bot " + token)
 	if err != nil {
 		log.Fatalln("Error creating Discord session: ", err)
 		return
 	}
 
-	// Register messageCreate as a callback for the messageCreate events.
 	dg.AddHandler(messageCreate)
 
 	dg.AddHandler(messageReactionAdd)
 
-	// We need information about guilds (which includes their channels),
-	// messages and voice states.
 	dg.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildEmojis | discordgo.IntentsGuildMessageReactions
 
-	// Open the websocket and begin listening.
 	err = dg.Open()
 	if err != nil {
 		log.Fatalln("Error opening Discord session: ", err)
 	}
 
-	// Wait here until CTRL-C or other term signal is received.
 	log.Println("Pan Bot started.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
 
-	// Cleanly close down the Discord session.
 	dg.Close()
 }
 
-// This function will be called (due to AddHandler above) every time a new
-// message is created on any channel that the autenticated bot has access to.
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
-	// Ignore all messages created by the bot itself
-	// This isn't required in this specific example but it's a good practice.
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
