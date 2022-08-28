@@ -2,14 +2,18 @@
 
 Very limited discord bot. Do not use.
 
+User interface is in Polish.
+
 ## Build
 
+Using [just](https://github.com/casey/just):
+
 ```sh
-go build
+just
 ```
 
-## Static Build
+Manual build:
 
 ```sh
-env CGO_ENABLED=0 go build
+CGO_ENABLED=0 go build
 ```
