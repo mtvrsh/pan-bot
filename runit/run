@@ -1,4 +1,2 @@
 #!/bin/sh
-[ -r conf ] && . ./conf
-exec 2>&1
-exec pan-bot -t "$TOKEN"
+exec podman start -a pan-bot

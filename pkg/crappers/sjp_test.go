@@ -1,10 +1,12 @@
-package main
+package crappers //(s)crapper
 
 import (
 	"testing"
 )
 
-func TestSjpQuery(t *testing.T) {
+func TestQuery(t *testing.T) {
+	t.Parallel()
+
 	tests := make(map[string]string)
 
 	tests[" przestać    \t"] = "przestać nie ma opisu"
@@ -13,19 +15,27 @@ func TestSjpQuery(t *testing.T) {
 		" seksualnie kobieta; laska, dziwa, dupencja, towar\n3. człowiek niez" +
 		"aradny, oferma; niezdara, ślamazara, gamoń\n4. tył czegoś, tylna czę" +
 		"ść czegoś; zad"
-	tests["burgundowy"] = ""
-	tests["sławomira"] = ""
-	tests["moje"] = ""
+	tests["burgundowy"] = "" //needs following links support
+	tests["sławomira"] = "imię żeńskie\nimię męskie"
+	tests["moje"] = "zaimek dzierżawczy będący odpowiednikiem zaimka osoboweg" +
+		"o \"ja\"\npotocznie: to, co stanowi własność mówiącego lub ma z nim " +
+		"związek\npotocznie: kobieta, która wraz z mówiącym stanowi parę (np." +
+		" małżeńską)\npotocznie: osoba, która wraz z mówiącym stanowi parę (n" +
+		"p. małżeńską)"
 	tests["jajo"] = "1. jajko ptaków domowych wykorzystywane do przygotowywan" +
 		"ia potraw\n2. żeńska komórka rozrodcza, komórka jajowa\n3. potocznie" +
 		": przedmiot o owalnym kształcie\n4. potocznie: jądro męskie; jajco"
 	tests["niewystepuje2137"] = "Nie występuje w słowniku"
-	tests[""] = "Puste zapytanie, pusta odpowiedź :)"
-	tests["  "] = "Puste zapytanie, pusta odpowiedź :)"
+	tests[""] = emptyQuery
+	tests[" \n \t "] = emptyQuery
 
 	for tt, want := range tests {
+		tt, want := tt, want
+
 		t.Run(tt, func(t *testing.T) {
-			resp, err := sjpQuery(tt)
+			t.Parallel()
+
+			resp, err := SjpQuery(tt)
 			if err != nil {
 				t.Error(err)
 			}
@@ -36,31 +46,20 @@ func TestSjpQuery(t *testing.T) {
 	}
 }
 
-func TestAsMdCode(t *testing.T) {
-	s := asMdCode("test")
-	want := "```text\ntest\n```"
-	if s != want {
-		t.Errorf("got:\n%v\nwant:\n%v", s, want)
-	}
-}
-
-func BenchmarkSjpQueryEmpty(b *testing.B) {
-	_, err := sjpQuery("")
-	if err != nil {
+func BenchmarkQueryEmpty(b *testing.B) {
+	if _, err := SjpQuery(""); err != nil {
 		b.Error(err)
 	}
 }
 
-func BenchmarkSjpQueryNonExistent(b *testing.B) {
-	_, err := sjpQuery("123")
-	if err != nil {
+func BenchmarkQueryNonExistent(b *testing.B) {
+	if _, err := SjpQuery("123"); err != nil {
 		b.Error(err)
 	}
 }
 
-func BenchmarkSjpQueryReal(b *testing.B) {
-	_, err := sjpQuery("test")
-	if err != nil {
+func BenchmarkQueryReal(b *testing.B) {
+	if _, err := SjpQuery("test"); err != nil {
 		b.Error(err)
 	}
 }
