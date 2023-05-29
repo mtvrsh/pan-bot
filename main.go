@@ -10,7 +10,7 @@ import (
 	"strings"
 	"syscall"
 
-	scrapper "github.com/m3tav3rse/pan-bot/pkg/crappers"
+	"github.com/m3tav3rse/pan-bot/pkg/crappers"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -43,18 +43,18 @@ func main() {
 
 	// no/empty flag, use environment variable
 	if token == "" {
-		token = cfg.token
+		token = cfg.Token
 	}
 
 	if token == "" {
 		log.Fatalln("No token provided, check \"pan-bot -h\"")
 	}
 
-	if cfg.wpcChannelID == "" {
+	if cfg.WpcChannelID == "" {
 		log.Println("wpcChannelID is empty")
 	}
 
-	if cfg.astroChannelID == "" {
+	if cfg.AstroChannelID == "" {
 		log.Println("astroChannelID is empty")
 	}
 
@@ -112,11 +112,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				log.Println(err)
 			}
 		case strings.HasPrefix(msg, "sjp"):
-			message, err := scrapper.SjpQuery(msg[3:])
+			message, err := crappers.QuerySjp(msg[3:])
 			if err != nil {
 				log.Println(err)
 
-				_, err := s.ChannelMessageSend(m.ChannelID, "SjpQuery: błąd: "+err.Error())
+				_, err := s.ChannelMessageSend(m.ChannelID, "sjp: błąd: "+err.Error())
 				if err != nil {
 					log.Println(err)
 				}
@@ -127,7 +127,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				}
 			}
 		case strings.HasPrefix(msg, "wpc"):
-			wpcPrice, err := scrapper.GetWpcPrice()
+			wpcPrice, err := crappers.GetWpcPrice()
 			if err != nil {
 				log.Println(err)
 				_, err := s.ChannelMessageSend(m.ChannelID, "wpc.GetWpcPrice: błąd: "+err.Error())
@@ -135,8 +135,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 					log.Println(err)
 				}
 			}
-			newName := "700g WPC↹" + wpcPrice + "PLN💰"
-			_, err = s.ChannelEdit(cfg.wpcChannelID, &discordgo.ChannelEdit{Name: newName})
+			newName := "700g WPC ↹ " + wpcPrice + "PLN"
+			_, err = s.ChannelEdit(cfg.WpcChannelID, &discordgo.ChannelEdit{Name: newName})
 			if err != nil {
 				log.Println(err)
 			} else {
@@ -177,24 +177,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	case containsUser(m.Mentions, s.State.User.ID):
 		err := reactWithGuildEmoji(s, m.Message, "🖕")
-		if err != nil {
-			log.Println(err)
-		}
-	}
-}
-
-func messageReactionAdd(session *discordgo.Session, m *discordgo.MessageReactionAdd) {
-	msg, err := session.ChannelMessage(m.ChannelID, m.MessageID)
-	if err != nil {
-		log.Println("Couldn't retrieve message to react to")
-		return
-	} else if msg.Author.ID == session.State.User.ID {
-		return
-	}
-
-	switch {
-	case m.Emoji.Name == "KEKW":
-		err := session.MessageReactionAdd(m.ChannelID, m.MessageID, m.Emoji.APIName())
 		if err != nil {
 			log.Println(err)
 		}

@@ -1,15 +1,19 @@
-on: [push, pull_request]
+name: Build and lint
+
+on: [pull_request, workflow_dispatch]
 permissions:
   contents: read
   pull-requests: read
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
-      - run: go build -ldflags "-X main.version=$(git log -1 --pretty=%h)"
-      - run: ./pan-bot -v
-      - uses: golangci/golangci-lint-action@v3
-        with:
-          args: -E goimports
+
+      - name: Build
+        run: go build -ldflags "-X main.version=$(git log -1 --pretty=%h)" -v
+        run: ./pan-bot -v
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3

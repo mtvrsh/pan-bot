@@ -1,4 +1,4 @@
-package crappers //(s)crapper
+package crappers //(s)crappers
 
 import (
 	"html"
@@ -14,9 +14,9 @@ const (
 	emptyQuery = "Puste zapytanie, pusta odpowiedź :)"
 )
 
-// SjpQuery returns meaning(s) of word found in html from sjpURL
-// doesn't return error if there is no description or word doesn't exist
-func SjpQuery(word string) (string, error) {
+// QuerySjp returns meaning(s) of word found in html from sjpURL.
+// Doesn't return error if there is no description or word doesn't exist.
+func QuerySjp(word string) (string, error) {
 	word = strings.TrimSpace(word)
 	if word == "" {
 		return emptyQuery, nil
@@ -48,7 +48,6 @@ func SjpQuery(word string) (string, error) {
 	text := parAll.FindAllString(string(body), -1)
 
 	var result string
-
 	for _, x := range text {
 		s := linebreak.ReplaceAllString(x, "\n")
 		s = parStart.ReplaceAllString(s, "")
@@ -58,7 +57,6 @@ func SjpQuery(word string) (string, error) {
 	}
 
 	result = strings.Trim(result, " \t\n")
-
 	if result == "" {
 		return word + " nie ma opisu", nil
 	}

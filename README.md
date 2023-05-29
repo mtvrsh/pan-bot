@@ -25,8 +25,10 @@ CGO_ENABLED=0 go build
 1. Build docker image:
 
 ```sh
-just build-dockerfile ${OPTIONAL_REGISTRY}
+just build-dockerfile ${REGISTRY}
 ```
+
+*Specifying docker registry is optional.*
 
 2. Fill `config.json` and create secret:
 
@@ -40,12 +42,16 @@ podman secret create pan-bot-config config.json
 podman create --secret pan-bot-config --name pan-bot localhost/pan-bot:${VERSION}
 ```
 
-4. Enable [runit user service](https://docs.voidlinux.org/config/services/user-services.html#per-user-services).
+4. Optionally:
+
+   * Enable [runit user service](https://docs.voidlinux.org/config/services/user-services.html#per-user-services)
+   * `run` file is in `runit/` directory
+
 
 ## Misc
 
-* Benchmarks:
+* Run benchmarks:
 
 ```sh
-just test -bench-. -v
+just test -v -bench=. -run=^#
 ```

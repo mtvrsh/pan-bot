@@ -1,6 +1,6 @@
 package pudzianmechaniczny
 
-// Pm - Pudzian mechaniczny (Pudzianpower), W - Watt, HP - horsepower
+// Pm - Pudzian mechaniczny (Pudzianpower), W - Watt, HP - horsepower.
 const (
 	gravity       = 9.81
 	hp            = 745.7 // 1HP = 745.7W

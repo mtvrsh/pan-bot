@@ -1,15 +1,17 @@
-package crappers //(s)crapper
+package crappers //(s)crappers
 
 import (
 	"testing"
 )
 
 func TestGetWpcPrice(t *testing.T) {
+	const expectedPrice = "49.99"
+	t.Parallel()
 	price, err := GetWpcPrice()
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Error(err.Error())
 	}
-	if price != "49.99" {
-		t.Errorf("got:\n%v\nwant:\n%v", price, "49.99")
+	if price != expectedPrice {
+		t.Errorf("got:\n%v\nwant:\n%v", price, expectedPrice)
 	}
 }

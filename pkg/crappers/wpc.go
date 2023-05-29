@@ -1,4 +1,4 @@
-package crappers //(s)crapper
+package crappers //(s)crappers
 
 import (
 	"io"
@@ -10,7 +10,12 @@ const wpcURL = "https://sklep.kfd.pl/kfd-pure-wpc-82-instant-700-g-bialko-serwat
 
 // GetWpcPrice returns price of item found on wpcURL
 func GetWpcPrice() (string, error) {
-	resp, err := http.Get(wpcURL)
+	return GetKfdPrice(wpcURL)
+}
+
+func GetKfdPrice(s string) (string, error) {
+	// TODO validate urls?
+	resp, err := http.Get(s)
 	if err != nil {
 		return "", err
 	}

@@ -25,13 +25,13 @@ const helpMessage = `Dostępne komendy:
 `
 
 type config struct {
-	token          string
-	astroChannelID string
-	wpcChannelID   string
+	Token          string
+	AstroChannelID string
+	WpcChannelID   string
 }
 
 func loadConfig(path string) (config, error) {
-	var c map[string]string
+	var c config
 	var err error
 
 	if path == "" {
@@ -57,10 +57,25 @@ func loadConfig(path string) (config, error) {
 
 	log.Println("config loaded from: " + path)
 
-	return config{
-		token: c["Token"], astroChannelID: c["astroChannelID"],
-		wpcChannelID: c["wpcChannelID"],
-	}, nil
+	return c, nil
+}
+
+func messageReactionAdd(session *discordgo.Session, m *discordgo.MessageReactionAdd) {
+	msg, err := session.ChannelMessage(m.ChannelID, m.MessageID)
+	if err != nil {
+		log.Println("Couldn't retrieve message to react to")
+		return
+	} else if msg.Author.ID == session.State.User.ID {
+		return
+	}
+
+	switch {
+	case m.Emoji.Name == "KEKW":
+		err := session.MessageReactionAdd(m.ChannelID, m.MessageID, m.Emoji.APIName())
+		if err != nil {
+			log.Println(err)
+		}
+	}
 }
 
 func getGuildEmoji(s *discordgo.Session, emoji, guildID string) (string, error) {
@@ -106,47 +121,52 @@ func containsUser(a []*discordgo.User, b string) bool {
 	return false
 }
 
-func pudzianConverter(s string) string {
+func pudzianConverter(s string) string { // refactor
+	var unit string
+	failMsg := "Błędne dane: podaj liczbę i jednostkę (KM,PM,W)\n" +
+		"Na przykład: 1337 KM"
 	words := strings.Fields(s)
 
+	// TODO rm HP?
 	if len(words) == 1 {
 		switch {
 		case strings.HasSuffix(words[0], "HP"):
 			words[0] = strings.TrimSuffix(words[0], "HP")
-			words = append(words, "HP")
+			fallthrough
 		case strings.HasSuffix(words[0], "KM"):
-			words[0] = strings.TrimSuffix(words[0], "KM")
-			words = append(words, "KM")
+			unit = "KM"
 		case strings.HasSuffix(words[0], "PM"):
-			words[0] = strings.TrimSuffix(words[0], "PM")
-			words = append(words, "PM")
+			unit = "PM"
 		case strings.HasSuffix(words[0], "W"):
-			words[0] = strings.TrimSuffix(words[0], "W")
-			words = append(words, "W")
+			unit = "W"
 		}
+		words[0] = strings.TrimSuffix(words[0], unit)
+		words = append(words, unit)
 	}
 
 	if len(words) == 2 {
+		var result float64
 		number, err := strconv.ParseFloat(words[0], 64)
 		if err != nil {
-			log.Println(err) // TODO remove?
-			return "Błąd 404: nie znaleziono Pudziana"
+			return failMsg
 		}
 		switch words[1] {
 		case "HP":
 			fallthrough
 		case "KM":
-			return fmt.Sprintf("%v %v to %.2f PM", words[0], words[1],
-				pudzianmechaniczny.HPToPM(number))
+			unit = "PM"
+			result = pudzianmechaniczny.HPToPM(number)
 		case "PM":
-			return fmt.Sprintf("%v %v to %.2f KM", words[0], words[1],
-				pudzianmechaniczny.PMToHP(number))
+			unit = "KM"
+			result = pudzianmechaniczny.PMToHP(number)
 		case "W":
-			return fmt.Sprintf("%v %v to %.2f PM", words[0], words[1],
-				pudzianmechaniczny.WToPM(number))
+			unit = "PM"
+			result = pudzianmechaniczny.WToPM(number)
+		default:
+			return failMsg
 		}
+		return fmt.Sprintf("%v %v to %.2f %v", words[0], words[1], result, unit)
 	}
 
-	return "Błędne dane: podaj liczbę i jednostkę (KM,PM,W)\n" +
-		"Na przykład: 1337 KM"
+	return failMsg
 }

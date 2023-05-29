@@ -1,0 +1,23 @@
+linters:
+  enable:
+    - asciicheck
+    - bodyclose
+    - dogsled
+    - dupl
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - exportloopref
+    - gofumpt
+    - goimports
+    - misspell
+    - nakedret
+    - nilerr
+    - prealloc
+    - unconvert
+    - unparam
+    - whitespace
+
+issues:
+  max-same-issues: 0
+  #new-from-rev: HEAD
