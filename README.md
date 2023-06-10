@@ -20,7 +20,7 @@ just
 CGO_ENABLED=0 go build
 ```
 
-## Docker/podman setup:
+## Container setup:
 
 1. Build docker image:
 
